@@ -22,7 +22,8 @@ class ClusterListener extends Actor with ActorLogging {
     case MemberRemoved(member, previousStatus) =>
       log.debug("Member is Removed: {} after {}",
         member.address, previousStatus)
-      case LeaderChanged(member) => log.info("Leader changed: " + member)
-      case any: MemberEvent => log.info("Member Event: " + any.toString) // ignore
-      }
+    case LeaderChanged(member) => log.info("Leader changed: " + member)
+    case any: MemberEvent => log.info("Member Event: " + any.toString) // ignore
   }
+
+}
