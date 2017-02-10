@@ -12,9 +12,11 @@ To run the cluster, run `docker-compose up`. This will create 3 nodes, a seed an
 Or run each container separately with:
 
 ```
-docker run --rm -it --name seed mhamrah/clustering:0.3
-docker run --rm -it --name member1 --link seed:seed mhamrah/clustering:0.3
-docker run --rm -it --name member2 --link seed:seed mhamrah/clustering:0.3
+docker run --rm -it --name seed nmurthy/clustering:0.3
+docker run --rm -it --name member1 --link seed:seed nmurthy/clustering:0.3
+docker run --rm -it --name member2 --link seed:seed nmurthy/clustering:0.3
+...
+docker run --rm -it --name memberN --link seed:seed nmurthy/clustering:0.3
 ```
 
 While running, try opening a new terminal and (from the same directory) try things like `docker-compose down seed` and watch the cluster nodes respond.
