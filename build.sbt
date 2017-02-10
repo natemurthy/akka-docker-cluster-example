@@ -1,3 +1,5 @@
+import com.typesafe.sbt.packager.docker._
+
 name := "clustering"
 
 organization := "com.mlh"
@@ -17,7 +19,7 @@ scmInfo := Some(
 )
 
 /* scala versions and options */
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.8"
 
 // These options will be used for *all* versions.
 scalacOptions ++= Seq(
@@ -32,33 +34,34 @@ scalacOptions ++= Seq(
   ,"-language:postfixOps"
 )
 
-val akka = "2.3.7"
+val akka = "2.4.13"
 
 /* dependencies */
 libraryDependencies ++= Seq (
   "com.github.nscala-time" %% "nscala-time" % "1.2.0"
   // -- testing --
-  , "org.scalatest" % "scalatest_2.10" % "2.1.0" % "test"
+  , "org.scalatest" %% "scalatest" % "2.2.6" % "test"
   // -- Logging --
-  ,"ch.qos.logback" % "logback-classic" % "1.1.1"
+  ,"ch.qos.logback" % "logback-classic" % "1.1.7"
   // -- Akka --
   ,"com.typesafe.akka" %% "akka-testkit" % akka % "test"
   ,"com.typesafe.akka" %% "akka-actor" % akka
   ,"com.typesafe.akka" %% "akka-slf4j" % akka
   ,"com.typesafe.akka" %% "akka-cluster" % akka
   // -- json --
-  ,"org.json4s" %% "json4s-jackson" % "3.2.10"
+  ,"org.json4s" %% "json4s-jackson" % "3.3.0"
   // -- config --
-  ,"com.typesafe" % "config" % "1.2.0"
+  ,"com.typesafe" % "config" % "1.3.0"
 )
 
-maintainer := "Michael Hamrah <m@hamrah.com>"
+dockerRepository := Some("nmurthy")
+dockerCommands := Seq(
+  Cmd("FROM", "openjdk:8-jre-alpine"),
+  Cmd("WORKDIR","/opt/docker"),
+  Cmd("ADD","opt /opt"),
+  Cmd("EXPOSE","1600"),
+  Cmd("RUN","apk add --update bash && rm -rf /var/cache/apk/*"),
+  ExecCmd("ENTRYPOINT","sh", "-c", "CLUSTER_IP=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1 }'` bin/clustering $*")
+)
 
-dockerExposedPorts in Docker := Seq(1600)
-
-dockerEntrypoint in Docker := Seq("sh", "-c", "CLUSTER_IP=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1 }'` bin/clustering $*")
-
-dockerRepository := Some("mhamrah")
-
-dockerBaseImage := "java"
 enablePlugins(JavaAppPackaging)
